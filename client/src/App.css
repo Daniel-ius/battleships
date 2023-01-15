@@ -5,6 +5,7 @@ body{
   background: cornflowerblue;
 }
 table{
+  margin: 0 auto;
   border-collapse: collapse;
 }
 td{
@@ -17,7 +18,7 @@ td{
 .ship{
   background: black;
 }
-.ship{
+.hit{
   background: orange;
 }
 .miss{

@@ -1,34 +1,71 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React, { useState, useEffect } from "react"
+import axios from "axios"
+import "./App.css"
+
 
 function App() {
-    const [board, setBoard] = useState([]);
+    const [board, setBoard] = useState([])
+    const [shots, setShots] =useState(25)
+    const [score, setScore]=useState(0)
+    const [game_over, setGame_over]=useState(false);
 
     useEffect(() => {
-        fetch("http://localhost:3001/board")
-            .then((res) => res.json())
-            .then((data) => setBoard(data));
+        axios
+            .get("http://localhost:3001/board")
+            .then((res)=>setBoard(res.data))
     }, []);
+    useEffect(()=>{
+        axios
+            .get("http://localhost:3001/shots")
+            .then((res)=>setShots(res.data.shots))
+
+        axios
+            .get("http://localhost:3001/score")
+            .then((res) => setScore(res.data.score))
+
+
+        axios
+            .get("http://localhost:3001/gameover")
+            .then((res) => setGame_over(res.data.gameover))
+    })
+
+    const Check_Move=(x,y)=>{
+        axios
+            .post("http://localhost:3001/move", {
+                x: x,
+                y: y,
+            })
+            .then((res) => {
+                setBoard(res.data.board);
+                setShots(res.data.shots);
+                setScore(res.data.score);
+                setGame_over(res.data.gameover);
+            })
+    }
 
     return (
     <div className="App">
-        <h2>Laivų Musis</h2>
-        <table>
-            <tbody>
-            {board.map((row,i)=>(
-                <tr key={i}>
-                    {row.map((cell,j)=>(
-                    <td key={j}
-                    className={cell}
-
-                    ></td>
-                    ))}
-                </tr>
-            ))}
-            </tbody>
-        </table>
+        <h2>Laivų Mūšis</h2>
+        <h4>Shots left: {shots}</h4>
+        <h4>Score: {score}</h4>
+        {game_over?(<div>Game over</div>):(
+            <table>
+                <tbody>
+                {board.map((row,i)=>(
+                    <tr key={i}>
+                        {row.map((cell,j)=>(
+                            <td key={j}
+                                onClick={()=>Check_Move(i,j)}
+                                className={`${cell===2? "hit":cell===1?"ship":"miss"}`}
+                            ></td>
+                        ))}
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        )}
     </div>
-        );
+        )
 }
 
-export default App;
+export default App
