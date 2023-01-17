@@ -1,65 +1,77 @@
-const express = require("express");
+const express = require("express")
 const cors=require("cors")
 const PORT = 3001;
-const app = express();
+const app = express()
 app.use(express.json())
 app.use(cors())
 
-let board=createBoard()
-let game_over=false
-let shots=25
-let score=0
-
-
-
+let game= {
+    board: createBoard(),
+    game_over: false,
+    shots: 25,
+    score: 0,
+    message:"start"
+}
+function restartGame(){
+    game.board=createBoard()
+    game.game_over=false
+    game.shots=25
+    game.score=0
+    game.message="start"
+}
 app.get('/board', (req, res) => {
-    res.send(board);
+    restartGame()
+    res.send(game)
 });
 app.post('/move', (req,res)=>{
     let x=req.body.x
     let y=req.body.y
     let result=Player_Move(x,y)
-    board[x][y]=result.hit ? 1 : 2;
-    res.json({board:result.board,shots: result.shots, score: result.score, game_over: result.game_over});
-})
-app.get("/shots",(req,res)=>{
-    res.json({shots});
-})
-app.get("/score",(req,res)=>{
-    res.json({score});
-})
-app.get("/gameover",(req,res)=>{
-    res.json({game_over})
+    if(result.game_over){
+        game.game_over=true
+    }
+    game.board=result.board
+    game.shots=result.shots
+    game.score=result.score
+    res.json(game)
 })
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
+    console.log(`Server is running on port ${PORT}.`)
 });
 function createBoard() {
-    let board = new Array(10);
+    let board = new Array(10)
     for (let i = 0; i < 10; i++) {
         board[i] = new Array(10)
         for (let j = 0; j < 10; j++) {
-            board[i][j] = 0;
+            board[i][j] = 0
         }
     }
-    generateShips(board);
-    return board;
+    generateShips(board)
+    return board
 }
 function  Player_Move(x, y){
-    if(shots<=0){
-        game_over=true
+    if(game.shots<=0){
+        game.message="You Lost"
+        game.game_over=true
+        return game
     }
-    if(board[x][y]===0){
-        board[x][y]=2
-        shots--;
-        return { board, shots, score, game_over: false};
-    }else if (board[x][y]===1){
-        board[x][y]=1;
-        score++;
+    if(game.board[x][y]===0){
+        game.message="miss"
+        game.board[x][y]=2
+        game.shots--
+        game.game_over=false
+        return game
+    }else if (game.board[x][y]===1){
+        game.message="hit"
+        game.board[x][y]=-1
+        game.score++;
         if(winCheck()){
-            return { board, shots, score, game_over: true };
+            game.game_over=true
+            game.message="You won"
+            return game
         }
-        return { board, shots, score, game_over: false};
+        game.game_over=false
+        return game
     }
 }
 function generateShips(board){
@@ -120,6 +132,6 @@ function shipCanBePlaced(board, x, y, length, rotation){
     return true;
 }
 function winCheck(){
-    return score === 25;
+    return game.score === 25
 }
 
