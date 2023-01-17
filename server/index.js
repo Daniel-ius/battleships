@@ -27,9 +27,7 @@ app.post('/move', (req,res)=>{
     let x=req.body.x
     let y=req.body.y
     let result=Player_Move(x,y)
-    if(result.game_over){
-        game.game_over=true
-    }
+    game.game_over=result.game_over
     game.board=result.board
     game.shots=result.shots
     game.score=result.score
