@@ -14,9 +14,11 @@ td{
   border: 1px solid black;
   background: darkgrey;
 }
-
+.water{
+  background: blue;
+}
 .ship{
-  background: black;
+  background: blue;
 }
 .hit{
   background: orange;

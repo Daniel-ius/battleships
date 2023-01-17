@@ -26,8 +26,8 @@ function App() {
 
         axios
             .get("http://localhost:3001/gameover")
-            .then((res) => setGame_over(res.data.gameover))
-    })
+            .then((res) => setGame_over(res.data.game_over))
+    },[board])
 
     const Check_Move=(x,y)=>{
         axios
@@ -36,36 +36,35 @@ function App() {
                 y: y,
             })
             .then((res) => {
-                setBoard(res.data.board);
+                setBoard(res.data.board)
                 setShots(res.data.shots);
                 setScore(res.data.score);
-                setGame_over(res.data.gameover);
+                setGame_over(res.data.game_over);
             })
     }
-
     return (
     <div className="App">
         <h2>Laivų Mūšis</h2>
         <h4>Shots left: {shots}</h4>
         <h4>Score: {score}</h4>
         {game_over?(<div>Game over</div>):(
-            <table>
-                <tbody>
-                {board.map((row,i)=>(
-                    <tr key={i}>
-                        {row.map((cell,j)=>(
-                            <td key={j}
-                                onClick={()=>Check_Move(i,j)}
-                                className={`${cell===2? "hit":cell===1?"ship":"miss"}`}
-                            ></td>
-                        ))}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+                <table>
+                    <tbody>
+                    {board.map((row,i)=>(
+                        <tr key={i}>
+                            {row.map((cell,j)=>(
+                                <td key={j}
+                                    onClick={()=>Check_Move(i,j)}
+                                    className={cell === 0 ? "water" : cell === 1 ? "hit" : cell === 2 ? "miss" : "ship"}
+                                ></td>
+                            ))}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
         )}
     </div>
-        )
+    )
 }
 
 export default App
